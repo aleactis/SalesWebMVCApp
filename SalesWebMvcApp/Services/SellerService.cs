@@ -25,12 +25,14 @@ namespace SalesWebMvcApp.Services
             return _context.Seller.ToList();
         }
 
-        public void Insert(Seller obj)
+        public void Insert(Seller objeto)
         {
-            //solução paleativa
-            obj.Department = _context.Department.First();
+            if (objeto is null)
+            {
+                throw new ArgumentNullException(nameof(objeto));
+            }
 
-            _context.Add(obj);
+            _context.Add(objeto);
             _context.SaveChanges();
         }
     }
