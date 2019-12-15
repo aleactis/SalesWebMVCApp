@@ -27,6 +27,9 @@ namespace SalesWebMvcApp.Services
 
         public void Insert(Seller obj)
         {
+            //solução paleativa
+            obj.Department = _context.Department.First();
+
             _context.Add(obj);
             _context.SaveChanges();
         }
