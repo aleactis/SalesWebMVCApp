@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -44,19 +45,17 @@ namespace SalesWebMvcApp.Controllers
 
         public IActionResult Delete(int? id)
         {
-            //Implementação paleativa
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id não fornecido" });
             }
 
             //Pegar o objeto que estamos querendo deletar
             var obj = _sellerService.FindById(id.Value);
 
-            //Implementação paleativa
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id não encontrado" });
             }
 
             return View(obj);
@@ -72,19 +71,17 @@ namespace SalesWebMvcApp.Controllers
 
         public IActionResult Details(int? id)
         {
-            //Solução paleativa
             if (id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id não fornecido" });
             }
 
             //Pegar o objeto que estamos querendo detalhar
             var obj = _sellerService.FindById(id.Value);
 
-            //Implementação paleativa
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id não encontrado" });
             }
 
             return View(obj);
@@ -97,7 +94,7 @@ namespace SalesWebMvcApp.Controllers
             if (id == null)
             {
                 //soluçãopaleativa
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id não fornecido" });
             }
 
             //Testar se o Id é nulo
@@ -105,7 +102,7 @@ namespace SalesWebMvcApp.Controllers
             
             if (obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id não encontrado" });
             }
 
             //Listar os departamentos na tela de edição
@@ -123,8 +120,7 @@ namespace SalesWebMvcApp.Controllers
         {
             if (id != seller.Id)
             {
-                //Solução paleativa
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = "Id não correspondente" });
             }
 
             //Tratar excessões
@@ -132,14 +128,20 @@ namespace SalesWebMvcApp.Controllers
                 _sellerService.Update(seller);
                 return RedirectToAction(nameof(Index));
             } 
-            catch (NotFoundException)
+            catch (ApplicationException e)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             } 
-            catch (DbConcurrencyException)
+        }
+
+        public IActionResult Error(string message)
+        {
+            var viewModel = new ErrorViewModel
             {
-                return BadRequest();
-            }
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+            return View(viewModel);
         }
     }
 }
