@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace SalesWebMvcApp.Services
 {
@@ -33,6 +34,18 @@ namespace SalesWebMvcApp.Services
             }
 
             _context.Add(objeto);
+            _context.SaveChanges();
+        }
+
+        public Seller FindById(int id)
+        {
+            return _context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id == id);
+        }
+
+        public void Remove(int id)
+        {
+            var obj = _context.Seller.Find(id);
+            _context.Remove(obj);
             _context.SaveChanges();
         }
     }

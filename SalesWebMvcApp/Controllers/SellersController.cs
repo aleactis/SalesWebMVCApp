@@ -40,5 +40,53 @@ namespace SalesWebMvcApp.Controllers
             _sellerService.Insert(seller);
             return RedirectToAction(nameof(Index));
         }
+
+        public IActionResult Delete(int? id)
+        {
+            //Implementação paleativa
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            //Pegar o objeto que estamos querendo deletar
+            var obj = _sellerService.FindById(id.Value);
+
+            //Implementação paleativa
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            return View(obj);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            _sellerService.Remove(id);
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Details(int? id)
+        {
+            //Solução paleativa
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            //Pegar o objeto que estamos querendo detalhar
+            var obj = _sellerService.FindById(id.Value);
+
+            //Implementação paleativa
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            return View(obj);
+        }
     }
 }
