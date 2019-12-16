@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using SalesWebMvcApp.Models;
 using SalesWebMvcApp.Models.ViewModels;
 using SalesWebMvcApp.Services;
+using SalesWebMvcApp.Services.Exceptions;
 
 namespace SalesWebMvcApp.Controllers
 {
@@ -87,6 +88,58 @@ namespace SalesWebMvcApp.Controllers
             }
 
             return View(obj);
+        }
+
+        public IActionResult Edit(int? id)
+        {
+            
+            //Testar se o Id existe
+            if (id == null)
+            {
+                //soluçãopaleativa
+                return NotFound();
+            }
+
+            //Testar se o Id é nulo
+            var obj = _sellerService.FindById(id.Value);
+            
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            //Listar os departamentos na tela de edição
+            List<Department> departments = _departmentService.FindAll();
+
+            //Criar um objeto do tipo SellerFormViewModel e passar os dados para ele por se tratar de uma edição
+            SellerFormViewModel viewModel = new SellerFormViewModel { Seller = obj, Departments = departments };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Seller seller)
+        {
+            if (id != seller.Id)
+            {
+                //Solução paleativa
+                return BadRequest();
+            }
+
+            //Tratar excessões
+            try {
+                _sellerService.Update(seller);
+                return RedirectToAction(nameof(Index));
+            } 
+            catch (NotFoundException)
+            {
+                return NotFound();
+            } 
+            catch (DbConcurrencyException)
+            {
+                return BadRequest();
+            }
         }
     }
 }
